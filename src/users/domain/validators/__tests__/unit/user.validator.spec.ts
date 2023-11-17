@@ -12,7 +12,7 @@ describe("UserValidator unit tests", () => {
     sut = UserValidatorFactory.create();
   });
 
-  it("Valid case for email field", () => {
+  it("Valid case field", () => {
     const props = UserDataBuilder({});
 
     const isValid = sut.validate(props);
@@ -49,14 +49,6 @@ describe("UserValidator unit tests", () => {
       expect(sut.errors["name"]).toStrictEqual([
         "name must be shorter than or equal to 255 characters",
       ]);
-    });
-
-    it("Valid case for name field", () => {
-      const props = UserDataBuilder({});
-
-      const isValid = sut.validate(props);
-      expect(isValid).toBeTruthy();
-      expect(sut.validatedData).toStrictEqual(new UserRules(props));
     });
   });
 
@@ -128,6 +120,29 @@ describe("UserValidator unit tests", () => {
       expect(isValid).toBeFalsy();
       expect(sut.errors["password"]).toStrictEqual([
         "password must be shorter than or equal to 100 characters",
+      ]);
+    });
+  });
+
+  describe("CreatedAt field", () => {
+    it("Invalidation cases for createdAt field", () => {
+      let isValid = sut.validate({
+        ...UserDataBuilder({}),
+        createdAt: 10 as any,
+      });
+
+      expect(isValid).toBeFalsy();
+      expect(sut.errors["createdAt"]).toStrictEqual([
+        "createdAt must be a Date instance",
+      ]);
+
+      isValid = sut.validate({
+        ...UserDataBuilder({}),
+        createdAt: "2023" as any,
+      });
+      expect(isValid).toBeFalsy();
+      expect(sut.errors["createdAt"]).toStrictEqual([
+        "createdAt must be a Date instance",
       ]);
     });
   });
