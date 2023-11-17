@@ -1,6 +1,6 @@
-import { UserEntity } from "@/users/domain/entities/user.entity";
+import { Entity } from "../entities/entity";
 
-export interface RepositoryInterface<E extends UserEntity> {
+export interface RepositoryInterface<E extends Entity> {
   insert(entity: E): Promise<void>;
   findById(id: number): Promise<E>;
   findAll(): Promise<E[]>;
