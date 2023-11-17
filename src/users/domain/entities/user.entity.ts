@@ -1,3 +1,5 @@
+import { UserValidatorFactory } from "../validators/user.validator";
+
 export type UserProps = {
   name: string;
   email: string;
@@ -7,14 +9,17 @@ export type UserProps = {
 
 export class UserEntity {
   constructor(public readonly props: UserProps) {
+    UserEntity.validate(props);
     this.props.createdAt = this.props.createdAt ?? new Date();
   }
 
   update(value: string) {
+    UserEntity.validate({ ...this.props, name: value });
     this.name = value;
   }
 
   updatePassword(value: string) {
+    UserEntity.validate({ ...this.props, password: value });
     this.password = value;
   }
 
@@ -40,5 +45,10 @@ export class UserEntity {
 
   public get createdAt(): Date {
     return this.props.createdAt;
+  }
+
+  static validate(props: UserProps) {
+    const validator = UserValidatorFactory.create();
+    validator.validate(props);
   }
 }
