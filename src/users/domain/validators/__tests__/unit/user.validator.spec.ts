@@ -12,7 +12,7 @@ describe("UserValidator unit tests", () => {
     sut = UserValidatorFactory.create();
   });
 
-  it("Valid case field", () => {
+  it("Valid case for user validator class", () => {
     const props = UserDataBuilder({});
 
     const isValid = sut.validate(props);
