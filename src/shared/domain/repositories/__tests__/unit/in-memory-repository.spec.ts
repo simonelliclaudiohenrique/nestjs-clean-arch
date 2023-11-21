@@ -18,20 +18,20 @@ describe("InMemoryRepository unit tests", () => {
     sut = new StubInMemoryRepository();
   });
 
-  it("inserts a new entity", async () => {
+  it("shold inserts a new entity", async () => {
     const entity = new StubEntity({ name: "test name", price: 50 });
     await sut.insert(entity);
 
     expect(entity.toJSON()).toStrictEqual(sut.items[0].toJSON());
   });
 
-  it("throw error when entity not found", async () => {
+  it("shold throw error when entity not found", async () => {
     await expect(sut.findById(99999)).rejects.toThrow(
       new NotFoundError("Entity not found"),
     );
   });
 
-  it("find a entity by id", async () => {
+  it("shold find a entity by id", async () => {
     const entity = new StubEntity({ name: "test name", price: 50 });
     await sut.insert(entity);
 
@@ -47,5 +47,29 @@ describe("InMemoryRepository unit tests", () => {
     const result = await sut.findAll();
 
     expect([entity]).toStrictEqual(result);
+  });
+
+  it("shold throw error on update entity not found", async () => {
+    const entity = new StubEntity({ name: "test name", price: 50 });
+    await expect(sut.update(entity)).rejects.toThrow(
+      new NotFoundError("Entity not found"),
+    );
+  });
+
+  it("shold find a entity by id", async () => {
+    const entity = new StubEntity({ name: "test name", price: 50 });
+    await sut.insert(entity);
+
+    const entityUpdate = new StubEntity(
+      {
+        name: "test name updated",
+        price: 10,
+      },
+      entity._id,
+    );
+
+    await sut.update(entityUpdate);
+
+    expect(entityUpdate.toJSON()).toStrictEqual(sut.items[0].toJSON());
   });
 });
