@@ -10,8 +10,30 @@ export abstract class InMemorySearchableRepository<E extends Entity>
   extends InMemoryRepository<E>
   implements SearchableRepositoryInterface<E, any, any>
 {
+  sortableFields: string[] = [];
   async search(props: SearchParams): Promise<SearchResult<E>> {
-    throw new Error("Method not implemented.");
+    const itemsFieltered = await this.applyFilter(this.items, props.filter);
+    const itemsSoreted = await this.applySort(
+      itemsFieltered,
+      props.sort,
+      props.sortDir,
+    );
+
+    const itemmsPaginated = await this.applySort(
+      itemsSoreted,
+      props.page,
+      props.perPage,
+    );
+
+    return new SearchResult({
+      items: itemmsPaginated,
+      total: itemsFieltered.length,
+      currentPage: props.page,
+      perPage: props.perPage,
+      sort: props.sort,
+      sortDir: props.sortDir,
+      filter: props.filter,
+    });
   }
 
   protected abstract applyFilter(
@@ -23,5 +45,26 @@ export abstract class InMemorySearchableRepository<E extends Entity>
     items: E[],
     sort: string | null,
     sortDir: string | null,
+  ): Promise<E[]> {
+    if (!sort || !this.sortableFields.includes(sort)) {
+      return items;
+    }
+    return [...items].sort((a, b) => {
+      if (a.props[sort] < b.props[sort]) {
+        return sortDir === "asc" ? -1 : 1;
+      }
+
+      if (a.props[sort] > b.props[sort]) {
+        return sortDir === "asc" ? 1 : -1;
+      }
+
+      return 0;
+    });
+  }
+
+  protected async applyPaginate(
+    items: E[],
+    page: SearchParams["page"] | null,
+    perPage: SearchParams["perPage"] | null,
   ): Promise<E[]> {}
 }
